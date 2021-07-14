@@ -1,5 +1,5 @@
 import datetime
-
+import click
 from flask import Blueprint
 from flask import render_template, request, redirect, url_for, jsonify
 from flask import g
@@ -51,6 +51,7 @@ def pet_info(pid):
                 description = description, #TODO Not being displayed
                 species = species,
                 tags = tags)
+    print(data)
     return render_template("petdetail.html", **data)
 
 @bp.route("/<pid>/edit", methods=["GET", "POST"])
@@ -72,9 +73,14 @@ def edit(pid):
                     tags = tags)
         return render_template("editpet.html", **data)
     elif request.method == "POST":
-        description = request.form.get('description')
+        descriptioni = request.form.get('description')
         sold = request.form.get("sold")
+        print(sold)
         # TODO Handle sold
+        if(sold=="1"):
+            cursor.execute(f"UPDATE pet SET sold = {datetime.date.today()} where id = {pid}")
+        cursor.execute(f"UPDATE pet SET description = '{descriptioni}' WHERE id =' {pid}'")
+        conn.commit()
         return redirect(url_for("pets.pet_info", pid=pid), 302)
         
     
